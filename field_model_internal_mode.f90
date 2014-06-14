@@ -1,0 +1,92 @@
+module Model
+
+implicit none
+
+integer, parameter :: dl = kind(1.d0)
+real(dl), parameter :: twopi = 6.283185307179586476925867665590_dl
+!
+! Model parameters, such as lattice size, etc
+!
+integer, parameter :: nlat = 256  ! Size of the lattice being used'
+integer, parameter :: pad = 2  ! padding to implement boundary conditions
+! implement this feature in a nicer way
+integer, parameter :: imin=1-pad, imax=nlat+pad
+
+! make these allocatable
+real(dl), dimension(imin:imax) :: fld, fldp, fldbg, fldpbg
+real(dl) :: period
+real(dl) :: length
+real(dl) :: dx
+real(dl) :: x0
+real(dl) :: dk
+
+! Model specific parameters
+real(dl) :: amp
+real(dl) :: width
+real(dl),parameter :: rat=1.e-5  ! value of background breather at boundaries
+
+contains
+!
+! This is simply to speed up the computations.  We compute the values of the space-dependent coefficients once so we don't have to compute them many times
+!
+  subroutine set_coeffs(ampset)
+    real(dl) :: ampset
+
+    amp = ampset
+
+    period = twopi
+    width = 3.**0.5
+
+! Set the length so that the field has damped down to some value R at the boundaries (needs to be set on a bg by bg basis
+    length =  8.*9.*width
+! Check for light crossing criterion
+    if (length < 2.*period) length = 2.*period
+    dx = length / nlat
+    x0 = length / 2.
+    dk = twopi / length
+
+    print*,"period is ",period," length is ",length
+  end subroutine set_coeffs
+
+! Adjust this as needed, maybe use phi_max not v
+  real(dl) function output_param()
+    output_param = amp
+  end function output_param
+
+! Model independent functions to return dx, period, etc.
+  real(dl) function get_period()
+    get_period = period
+  end function get_period
+
+  real(dl) function get_dx()
+    get_dx = dx
+  end function get_dx
+
+  real(dl) function k2eff(kreal)
+    real(dl) :: kreal
+
+    k2eff = 2.*(kreal-1.)/3.
+  end function k2eff
+
+!
+! Model specific definition of the effective mass
+!
+  real(dl) function effective_mass(x,t)
+    real(dl) :: x,t
+    real(dl) :: ptemp1, ptemp2
+    real(dl) :: xcur
+
+    xcur = (x-x0)/width
+
+    ptemp1 = tanh(xcur)
+    ptemp2 = amp*sinh(xcur)/cosh(xcur)**2
+    effective_mass = 2._dl*(ptemp1 + cos(t)*ptemp2)**2
+
+  end function effective_mass
+
+! Make sure that my choice of stencils for the |grad|^2 operator is actually the energy conserving choice (really only matters if I decide to include expansion)
+  subroutine energy_density()
+
+  end subroutine energy_density
+
+end module Model
