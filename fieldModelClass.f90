@@ -10,7 +10,7 @@ module Model
      integer :: imin, imax
      real(dl) :: length, dx, dk
 
-     real(dl), allocatable :: fld, fldp, fldbg, fldpbg
+     real(dl), allocatable :: fldbg, fldpbg
      real(dl) :: period
 
      integer :: nParams
@@ -26,18 +26,28 @@ contains
     type(fieldModel), intent(out) :: this
     integer, intent(in) :: n,pad
     real(dl), dimension(:), intent(in) :: params
+    integer :: imin, imax
+
+    imin = 1 - pad; imax = nlat + pad
 
     this%nlat = n
     this%pad = pad
-    this%imin = 1 - pad
-    this%imax = nlat + pad
+    this%imin = imin
+    this%imax = imax
 
-    allocate( this%fld(imin:imax), this%fldp(imin:imax) )
+    allocate( this%fldbg(imin:imax), this%fldpbg(imin:imax) )
 
     this%nParams = size(params)
     allocate( this%modParams(1:this%nParams) )
     call setParams(this, params)
   end subroutine createModel
+
+  subroutine destroyModel(this)
+    type(fieldModel), intent(inout) :: this
+    
+    deallocate( this%modParams )
+    deallocate( this%fldbg, this%fldpbg )
+  end subroutine destroyModel
 
   subroutine setParams(this, params)
     type(fieldModel), intent(inout) :: this
