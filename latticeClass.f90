@@ -22,6 +22,9 @@ contains
     iMin = 1-pad; iMax = n+pad
     this%nlat = n; this%pad = pad
     this%imin = iMin; this%imax = iMax
+
+    if ( allocated(this%fld) ) deallocate(this%fld)
+    if ( allocated(this%fldp) ) deallocate(this%fldp)
     allocate( this%fld(iMin:iMax),this%fldp(iMin:iMax) )
     tGlobal = 0.
 
@@ -33,6 +36,8 @@ contains
   subroutine destroyLattice(this)
     type(lattice), intent(inout) :: this
 
-    deallocate(this%fld,this%fldp)
+    if ( allocated(this%fld) ) deallocate(this%fld)
+    if ( allocated(this%fldp) ) deallocate(this%fldp)
   end subroutine destroyLattice
+
 end module myLattice
