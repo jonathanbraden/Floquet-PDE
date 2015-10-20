@@ -1,13 +1,9 @@
 module Model
-
+  use constants
   implicit none
-  integer, parameter :: dl = kind(1.d0) ! replace with a constants module
-  real(dl), parameter :: twopi = 6.283185307179586476925867665590_dl
 
   type fieldModel
-     integer :: nlat
-     integer :: pad
-     integer :: imin, imax
+     integer :: nlat, pad, imin, imax
      real(dl) :: length, dx, dk
 
      real(dl), allocatable :: fldbg, fldpbg
