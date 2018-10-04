@@ -26,7 +26,7 @@ contains
     if ( allocated(this%fld) ) deallocate(this%fld)
     if ( allocated(this%fldp) ) deallocate(this%fldp)
     allocate( this%fld(iMin:iMax),this%fldp(iMin:iMax) )
-    tGlobal = 0.
+    this%tGlobal = 0.
 
     this%dt = dt
     this%len = len; this%dx = len / dble(n)
@@ -39,5 +39,10 @@ contains
     if ( allocated(this%fld) ) deallocate(this%fld)
     if ( allocated(this%fldp) ) deallocate(this%fldp)
   end subroutine destroyLattice
+
+  subroutine resetLatticeClock(this)
+    type(lattice), intent(inout) :: this
+    this%tGlobal = 0.
+  end subroutine resetClock
 
 end module myLattice

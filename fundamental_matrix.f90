@@ -96,7 +96,7 @@ contains
     enddo
 !$OMP END PARALLEL DO
 
-! Check ordering in here
+! Check ordering in here.  Replace with DGEMM call
     fmatrix = matmul(binv,fmatrix)
   end subroutine make_matrix
 
